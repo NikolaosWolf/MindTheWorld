@@ -4,4 +4,9 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MindTheWorldServer.Extras\MindTheWorldServer.Extras.csproj" />
+    <ProjectReference Include="..\MindTheWorldServer.Implementation\MindTheWorldServer.Implementation.csproj" />
+  </ItemGroup>
+
 </Project>
