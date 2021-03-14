@@ -5,7 +5,7 @@ namespace MindTheWorldServer.Extras
 {
     public static class ExtrasModule
     {
-        public static IServiceCollection RegisterExtrasServices(this IServiceCollection services)
+        public static IServiceCollection RegisterExtras(this IServiceCollection services)
         {
             services.AddScoped<ICsvTransformer, CsvTransformer>();
 

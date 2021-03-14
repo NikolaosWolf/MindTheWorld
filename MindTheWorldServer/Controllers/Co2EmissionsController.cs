@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MindTheWorldServer.Infrastructure.Services;
+using MindTheWorldServer.Services.Definitions;
 using System.Threading.Tasks;
 
 namespace MindTheWorldServer.Controllers
@@ -18,9 +18,7 @@ namespace MindTheWorldServer.Controllers
 
         public async Task<IActionResult> Post(IFormFile file)
         {
-            var result = await _enviromentService.ImportCo2Emissions(file);
-
-            return Ok(result);
+            return Ok(await _enviromentService.ImportCo2Emissions(file));
         }
     }
 }

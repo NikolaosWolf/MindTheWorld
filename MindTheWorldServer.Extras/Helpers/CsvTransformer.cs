@@ -23,10 +23,7 @@ namespace MindTheWorldServer.Extras.Helpers
                     string line = await reader.ReadLineAsync();
                     var lineAsList = line.Split(',').ToList();
 
-                    string key = lineAsList[0];
-                    lineAsList.RemoveAt(0);
-
-                    result.Add(key, lineAsList);
+                    result.Add(lineAsList[0], lineAsList.Skip(1));
                 }
             }
 

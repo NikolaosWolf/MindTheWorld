@@ -3,17 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindTheWorldServer", "MindTheWorldServer\MindTheWorldServer.csproj", "{5677B3D5-1005-4D6D-90BA-8FD2B98BABA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindTheWorldServer", "MindTheWorldServer\MindTheWorldServer.csproj", "{5677B3D5-1005-4D6D-90BA-8FD2B98BABA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindTheWorldServer.Domain", "MindTheWorldServer.Domain\MindTheWorldServer.Domain.csproj", "{1C85725A-FC65-49DA-8744-3E12A23811DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindTheWorldServer.Domain", "MindTheWorldServer.Domain\MindTheWorldServer.Domain.csproj", "{1C85725A-FC65-49DA-8744-3E12A23811DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindTheWorldServer.Api", "MindTheWorldServer.Api\MindTheWorldServer.Api.csproj", "{149D4448-A0CE-46A7-85DA-2982CE0836AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindTheWorldServer.Api", "MindTheWorldServer.Api\MindTheWorldServer.Api.csproj", "{149D4448-A0CE-46A7-85DA-2982CE0836AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindTheWorldServer.Infrastructure", "MindTheWorldServer.Infrastructure\MindTheWorldServer.Infrastructure.csproj", "{65FC6C0A-91B3-44A4-8EF6-A5E322050A95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindTheWorldServer.Infrastructure", "MindTheWorldServer.Infrastructure\MindTheWorldServer.Infrastructure.csproj", "{65FC6C0A-91B3-44A4-8EF6-A5E322050A95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindTheWorldServer.Implementation", "MindTheWorldServer.Implementation\MindTheWorldServer.Implementation.csproj", "{A1B9C348-B44F-4818-9CC3-F0F90580287C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindTheWorldServer.Services", "MindTheWorldServer.Implementation\MindTheWorldServer.Services.csproj", "{A1B9C348-B44F-4818-9CC3-F0F90580287C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindTheWorldServer.Extras", "MindTheWorldServer.Extras\MindTheWorldServer.Extras.csproj", "{8E447EF9-2F03-423A-B849-17CAECED460B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindTheWorldServer.Extras", "MindTheWorldServer.Extras\MindTheWorldServer.Extras.csproj", "{8E447EF9-2F03-423A-B849-17CAECED460B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindTheWorldServer.Registrations", "MindTheWorldServer.Registrations\MindTheWorldServer.Registrations.csproj", "{5AB4A202-E727-4F57-B409-75775F49F458}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{8E447EF9-2F03-423A-B849-17CAECED460B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E447EF9-2F03-423A-B849-17CAECED460B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E447EF9-2F03-423A-B849-17CAECED460B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AB4A202-E727-4F57-B409-75775F49F458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AB4A202-E727-4F57-B409-75775F49F458}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AB4A202-E727-4F57-B409-75775F49F458}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AB4A202-E727-4F57-B409-75775F49F458}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

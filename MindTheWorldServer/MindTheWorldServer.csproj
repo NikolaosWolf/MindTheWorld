@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MindTheWorldServer.Extras\MindTheWorldServer.Extras.csproj" />
-    <ProjectReference Include="..\MindTheWorldServer.Implementation\MindTheWorldServer.Implementation.csproj" />
+    <ProjectReference Include="..\MindTheWorldServer.Implementation\MindTheWorldServer.Services.csproj" />
+    <ProjectReference Include="..\MindTheWorldServer.Registrations\MindTheWorldServer.Registrations.csproj" />
   </ItemGroup>
 
 </Project>
