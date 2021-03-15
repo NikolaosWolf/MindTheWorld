@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MindTheWorldServer.Implementation.Services;
 using MindTheWorldServer.Services.Definitions;
+using MindTheWorldServer.Services.Implementations;
 
 namespace MindTheWorldServer.Registrations.Services
 {
