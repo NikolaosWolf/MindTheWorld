@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MindTheWorldServer.Api\MindTheWorldServer.Api.csproj" />
+    <ProjectReference Include="..\MindTheWorldServer.Domain\MindTheWorldServer.Domain.csproj" />
     <ProjectReference Include="..\MindTheWorldServer.Extras\MindTheWorldServer.Extras.csproj" />
     <ProjectReference Include="..\MindTheWorldServer.Infrastructure\MindTheWorldServer.Infrastructure.csproj" />
   </ItemGroup>

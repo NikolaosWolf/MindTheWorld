@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
+﻿using GenericParsing;
+using Microsoft.AspNetCore.Http;
+using System.Data;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MindTheWorldServer.Extras.Helpers
@@ -12,22 +12,38 @@ namespace MindTheWorldServer.Extras.Helpers
         {
         }
 
-        public async Task<Dictionary<string, IEnumerable<string>>> Transform(IFormFile file)
+        public async Task<DataTable> Transform(IFormFile file)
         {
-            var result = new Dictionary<string, IEnumerable<string>>();
-            
-            using (var reader = new StreamReader(file.OpenReadStream()))
+            var dataTable = new DataTable();
+
+            using (var parser = new GenericParser(new StreamReader(file.OpenReadStream())))
             {
-                while (reader.Peek() >= 0)
-                {
-                    string line = await reader.ReadLineAsync();
-                    var lineAsList = line.Split(',').ToList();
+                await LoadHeader(parser, dataTable);
+                await LoadData(parser, dataTable);
+            };
 
-                    result.Add(lineAsList[0], lineAsList.Skip(1));
-                }
+            return dataTable;
+        }
+
+        private async Task LoadHeader(GenericParser parser, DataTable dataTable)
+        {
+            parser.Read();
+
+            for (int i = 0; i < parser.ColumnCount; i++)
+                dataTable.Columns.Add(parser[i]);
+        }
+
+        private async Task LoadData(GenericParser parser, DataTable dataTable)
+        {
+            while (parser.Read())
+            {
+                DataRow row = dataTable.NewRow();
+
+                for (int i = 0; i < dataTable.Columns.Count; i++)
+                    row[i] = parser[i];
+
+                dataTable.Rows.Add(row);
             }
-
-            return result;
         }
     }
 }

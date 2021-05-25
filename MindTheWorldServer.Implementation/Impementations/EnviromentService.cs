@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
-using MindTheWorldServer.Api.Dtos;
+using MindTheWorldServer.Domain;
 using MindTheWorldServer.Extras.Helpers;
 using MindTheWorldServer.Services.Definitions;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MindTheWorldServer.Services.Implementations
@@ -11,38 +10,81 @@ namespace MindTheWorldServer.Services.Implementations
     public class EnviromentService : IEnviromentService
     {
         private readonly ICsvTransformer _csvTransformer;
+        private readonly ITransformService _transformService;
+        private readonly MindTheWorldContext _mindTheWorldContext;
 
-        public EnviromentService(ICsvTransformer csvTransformer)
+        public EnviromentService(ICsvTransformer csvTransformer,
+                                 ITransformService transformService,
+                                 MindTheWorldContext mindTheWorldContext)
         {
             _csvTransformer = csvTransformer;
+            _transformService = transformService;
+            _mindTheWorldContext = mindTheWorldContext;
         }
 
-        public async Task<IEnumerable<Co2EmissionDto>> ImportCo2Emissions(IFormFile inputFile)
+        public async Task<IEnumerable<MaterialFootprintPerCapitum>> ImportMaterialFootprints(IFormFile inputFile)
         {
-            var dictionary = await _csvTransformer.Transform(inputFile);
+            var dataTable = await _csvTransformer.Transform(inputFile);
 
-            var result = new List<Co2EmissionDto>();
+            _mindTheWorldContext
+                .MaterialFootprintPerCapita
+                .AddRange(await _transformService.ToEntities<MaterialFootprintPerCapitum, decimal?>(dataTable));
 
-            var years = new List<int>();
+            await _mindTheWorldContext.SaveChangesAsync();
 
-            var indexRow = dictionary.Values.FirstOrDefault();
+            return null;
+        }
 
-            foreach (var year in indexRow)
-                years.Add(int.Parse(year));
+        public async Task<IEnumerable<Co2EmissionsPerPerson>> ImportCo2Emissions(IFormFile inputFile)
+        {
+            var dataTable = await _csvTransformer.Transform(inputFile);
 
-            years.OrderBy(y => y);
+            _mindTheWorldContext
+                .Co2EmissionsPerPeople
+                .AddRange(await _transformService.ToEntities<Co2EmissionsPerPerson, decimal?>(dataTable));
 
-            foreach (var item in dictionary.Skip(1))
-            {
-                var yearValues = new List<YearlyValueDto>();
-                for (int i = 0; i < item.Value.Count(); i++)
-                    yearValues.Add(new YearlyValueDto { Year = years[i] , Value = item.Value.ToArray()[i] });
+            await _mindTheWorldContext.SaveChangesAsync();
 
-                var emission = new Co2EmissionDto { Country = new CountryDto { Name = item.Key }, YearValues = yearValues }; ;
-                result.Add(emission);
-            }
+            return null;
+        }
 
-            return result;
+        public async Task<IEnumerable<EpidemicDeath>> ImportEpidemicDeaths(IFormFile inputFile)
+        {
+            var dataTable = await _csvTransformer.Transform(inputFile);
+
+            _mindTheWorldContext
+                .EpidemicDeaths
+                .AddRange(await _transformService.ToEntities<EpidemicDeath, int?>(dataTable));
+
+            await _mindTheWorldContext.SaveChangesAsync();
+
+            return null;
+        }
+
+        public async Task<IEnumerable<RenewableWater>> ImportRenewableWaters(IFormFile inputFile)
+        {
+            var dataTable = await _csvTransformer.Transform(inputFile);
+
+            _mindTheWorldContext
+                .RenewableWaters
+                .AddRange(await _transformService.ToEntities<RenewableWater, decimal?>(dataTable));
+
+            await _mindTheWorldContext.SaveChangesAsync();
+
+            return null;
+        }
+
+        public async Task<IEnumerable<WaterWithdrawlPerPerson>> ImportWaterWithdrawals(IFormFile inputFile)
+        {
+            var dataTable = await _csvTransformer.Transform(inputFile);
+
+            _mindTheWorldContext
+                .WaterWithdrawlPerPeople
+                .AddRange(await _transformService.ToEntities<WaterWithdrawlPerPerson, decimal?>(dataTable));
+
+            await _mindTheWorldContext.SaveChangesAsync();
+
+            return null;
         }
     }
 }

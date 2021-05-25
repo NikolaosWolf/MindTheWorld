@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MindTheWorldServer.Extras;
-using MindTheWorldServer.Registrations.Services;
+using MindTheWorldServer.Domain;
+using MindTheWorldServer.Registrations;
 
 namespace MindTheWorldServer
 {
@@ -15,8 +15,12 @@ namespace MindTheWorldServer
         {
             services.AddControllers();
 
+            services.AddDbContext<MindTheWorldContext>();
+
             services.RegisterServices();
+            services.RegisterRepositories();
             services.RegisterExtras();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

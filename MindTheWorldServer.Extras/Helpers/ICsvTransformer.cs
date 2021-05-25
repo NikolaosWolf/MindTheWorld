@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace MindTheWorldServer.Extras.Helpers
@@ -11,6 +11,6 @@ namespace MindTheWorldServer.Extras.Helpers
         /// </summary>
         /// <param name="csvFile">The CSV file.</param>
         /// <returns></returns>
-        Task<Dictionary<string, IEnumerable<string>>> Transform(IFormFile csvFile);
+        Task<DataTable> Transform(IFormFile csvFile);
     }
 }

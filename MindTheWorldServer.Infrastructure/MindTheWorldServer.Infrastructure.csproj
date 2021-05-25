@@ -13,4 +13,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MindTheWorldServer.Domain\MindTheWorldServer.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

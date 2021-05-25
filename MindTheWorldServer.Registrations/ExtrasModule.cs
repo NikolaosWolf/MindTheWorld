@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MindTheWorldServer.Extras.Helpers;
 
-namespace MindTheWorldServer.Extras
+namespace MindTheWorldServer.Registrations
 {
     public static class ExtrasModule
     {
