@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MindTheWorld.Api\MindTheWorld.Api.csproj" />
+    <ProjectReference Include="..\MindTheWorld.Domain\MindTheWorld.Domain.csproj" />
+    <ProjectReference Include="..\MindTheWorld.Extras\MindTheWorld.Extras.csproj" />
+    <ProjectReference Include="..\MindTheWorld.Infrastructure\MindTheWorld.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
