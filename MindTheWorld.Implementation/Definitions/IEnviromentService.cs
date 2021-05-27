@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using MindTheWorld.Api.Dtos;
 using MindTheWorld.Domain;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,6 +8,8 @@ namespace MindTheWorld.Services.Definitions
 {
     public interface IEnviromentService
     {
+        Task<IEnumerable<IndexDto>> GetEpidemicDeathsAsync();
+
         /// <summary>
         /// Imports a collection of <see cref="MaterialFootprintPerCapitum"/> from a .csv file to the database.
         /// </summary>

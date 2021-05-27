@@ -16,6 +16,13 @@ namespace MindTheWorldServer.Controllers
             _enviromentService = enviromentService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            return Ok(await _enviromentService.GetEpidemicDeathsAsync());
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Post(IFormFile file)
         {
             return Ok(await _enviromentService.ImportEpidemicDeaths(file));

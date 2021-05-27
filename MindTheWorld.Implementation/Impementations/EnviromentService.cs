@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using MindTheWorld.Api.Dtos;
 using MindTheWorld.Domain;
 using MindTheWorld.Extras.Helpers;
 using MindTheWorld.Services.Definitions;
@@ -85,6 +87,25 @@ namespace MindTheWorld.Services.Implementations
             await _mindTheWorldContext.SaveChangesAsync();
 
             return null;
+        }
+
+        public async Task<IEnumerable<IndexDto>> GetEpidemicDeathsAsync()
+        {
+            var data = await _mindTheWorldContext.EpidemicDeaths.Include(d => d.Country).ToListAsync();
+
+            var result = new List<IndexDto>();
+
+            foreach (var item in data)
+            {
+                result.Add(new IndexDto
+                {
+                    Country = item.Country.Name,
+                    Year = item.Year,
+                    Value = item.Value.GetValueOrDefault()
+                });
+            }
+
+            return result;
         }
     }
 }

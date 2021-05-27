@@ -1,0 +1,157 @@
+﻿@page "/charts/bar/vertical"
+@layout MainLayout
+@inject MindTheWorld.UI.Http.IMindTheWorldHttpClient Http
+
+@using ChartJs.Blazor.BarChart
+@using System.Drawing
+
+
+
+<h2>Vertical Bar Chart</h2>
+<div>
+    <select @onchange="UpdateChartByIndex">
+        <option value="Select" selected disabled="disabled">(Choose Type)</option>
+        @foreach (var type in Enum.GetValues(typeof(IndexType)))
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
+    <select @onchange="UpdateChartByCountry">
+        <option value="Select" selected disabled="disabled">(Choose Country)</option>
+        @foreach (var country in _data.Keys)
+        {
+            <option value="@country">@country</option>
+        }
+    </select>
+    <button @onclick="ClearData">Clear Data</button>
+</div>
+
+<Chart Config="_config" @ref="_chart"></Chart>
+@code {
+    private BarConfig _config;
+    private Chart _chart;
+
+    private IDictionary<string, List<YearlyValue>> _data;
+
+    protected override void OnInitialized()
+    {
+        _config = new BarConfig
+        {
+            Options = new BarOptions
+            {
+                Responsive = true,
+                Legend = new Legend
+                {
+                    Position = Position.Top
+                },
+                Title = new OptionsTitle
+                {
+                    Display = true,
+                    Text = "Vertical Bar Chart"
+                }
+            }
+        };
+
+        Init();
+    }
+
+    private void Init()
+    {
+        if (_data == null)
+            _data = new Dictionary<string, List<YearlyValue>>();
+    }
+
+    private async Task UpdateChartByIndex(ChangeEventArgs e)
+    {
+        switch (e.Value.ToString())
+        {
+            case nameof(IndexType.EpidemicDeaths):
+                _data = LoadIndexData<Http.Dtos.BarChartDto>(await Http.GetEpidemicDeathsAsync());
+                break;
+            default:
+                break;
+        }
+
+        foreach (var year in _data.First().Value.Select(v => v.Year))
+        {
+            _config.Data.Labels.Add($"{year}");
+        }
+
+        await _chart.Update();
+    }
+
+    private void UpdateChartByCountry(ChangeEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.Value.ToString()))
+            return;
+
+        Color color = ChartColors.GenerateRandomColor(new Random());
+        var values = _data.Single(d => d.Key.Equals(e.Value.ToString())).Value;
+
+        IDataset<int> dataset = new BarDataset<int>(values.Select(v => v.Value))
+        {
+            Label = $"{e.Value}",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(128, color)),
+            BorderColor = ColorUtil.FromDrawingColor(color),
+            BorderWidth = 1
+        };
+
+        _config.Data.Datasets.Add(dataset);
+        _chart.Update();
+    }
+
+    private void ClearData()
+    {
+        IList<IDataset> datasets = _config.Data.Datasets;
+        if (datasets.Count == 0)
+            return;
+
+        int counter = datasets.Count;
+        for (int i = counter; i > 0; i--)
+            datasets.RemoveAt(i - 1);
+
+        _chart.Update();
+    }
+
+
+    private Dictionary<string, List<YearlyValue>> LoadIndexData<T>(IEnumerable<T> apiData)
+        where T : Http.Dtos.BarChartDto
+    {
+        var result = new Dictionary<string, List<YearlyValue>>();
+        var groups = apiData.GroupBy(d => d.Country);
+        foreach (var group in groups)
+        {
+            string currentKey;
+            if (result.ContainsKey(group.Key))
+                currentKey = result.Keys.Single(k => k.Equals(group.Key));
+            else
+                currentKey = group.Key;
+
+            var values = new List<YearlyValue>();
+            foreach (var item in group)
+                values.Add(new YearlyValue(item.Year, item.Value));
+
+            result.Add(currentKey, values);
+        }
+
+        return result;
+    }
+
+    private enum IndexType
+    {
+        EpidemicDeaths
+    }
+
+    private class YearlyValue
+    {
+        internal int Year { get; set; }
+
+        internal int Value { get; set; }
+
+        public YearlyValue(int year, int value)
+        {
+            Year = year;
+            Value = value;
+        }
+    }
+}

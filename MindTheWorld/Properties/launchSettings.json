@@ -14,7 +14,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "MindTheWorldServer": {
+    "MindTheWorld": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
