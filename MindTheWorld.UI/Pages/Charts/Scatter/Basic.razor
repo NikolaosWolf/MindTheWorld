@@ -1,0 +1,222 @@
+﻿@page "/charts/scatter/basic"
+@layout MainLayout
+@inject MindTheWorld.UI.Http.IMindTheWorldHttpClient Http
+
+@using ChartJs.Blazor.ScatterChart
+@using ChartJs.Blazor.LineChart
+@using System.Drawing
+
+
+
+<h2>Basic Scatter Chart</h2>
+<div>
+    <button @onclick="GetCountries">Get Countries</button>
+    <button @onclick="GetIndexes">Get Indexes</button>
+    <select @onchange="UpdateCountry">
+        <option value="Select" selected disabled="disabled">(Choose Country)</option>
+        @foreach (var country in _countries)
+        {
+            <option value="@country.Id">@country.Name</option>
+        }
+    </select>
+    <select @onchange="UpdateFirstIndex">
+        <option value="Select" selected disabled="disabled">(Choose First Index)</option>
+        @foreach (var index in _indexes)
+        {
+            <option value="@index">@index</option>
+        }
+    </select>
+    <select @onchange="UpdateSecondIndex">
+        <option value="Select" selected disabled="disabled">(Choose Second Index)</option>
+        @foreach (var index in _indexes)
+        {
+            <option value="@index">@index</option>
+        }
+    </select>
+    <button @onclick="LoadData">Execute</button>
+    <button @onclick="ClearData">Clear Data</button>
+</div>
+
+<Chart Config="_config" @ref="_chart"></Chart>
+@code {
+    private ScatterConfig _config;
+    private Chart _chart;
+
+
+    private IEnumerable<MindTheWorld.UI.Http.Dtos.CountryDto> _countries;
+    private int _selectedCountryId;
+    private IEnumerable<string> _indexes;
+    private string _firstIndex;
+    private string _secondIndex;
+
+    protected override void OnInitialized()
+    {
+        _config = new ScatterConfig
+        {
+            Options = new LineOptions
+            {
+                Responsive = true,
+                Title = new OptionsTitle
+                {
+                    Display = true,
+                    Text = "Scatter Chart",
+                },
+                Tooltips = new Tooltips
+                {
+                    Mode = InteractionMode.Nearest,
+                    Intersect = true
+                },
+                Hover = new Hover
+                {
+                    Mode = InteractionMode.Nearest,
+                    Intersect = true
+                },
+                Scales = new Scales
+                {
+                    XAxes = new List<CartesianAxis>
+            {
+                        new CategoryAxis
+                        {
+                            ScaleLabel = new ScaleLabel
+                            {
+                                LabelString = "First Index",
+                                Display = true
+                            }
+                        }
+                    },
+                    YAxes = new List<CartesianAxis>
+            {
+                        new LinearCartesianAxis
+                        {
+                            ScaleLabel = new ScaleLabel
+                            {
+                                LabelString = "Second Index",
+                                Display = true
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        if (_countries == null)
+            _countries = Enumerable.Empty<MindTheWorld.UI.Http.Dtos.CountryDto>();
+
+        if (_indexes == null)
+            _indexes = Enumerable.Empty<string>();
+    }
+
+    private async Task GetCountries()
+    {
+        _countries = await Http.GetCountriesAsync() ?? Enumerable.Empty<MindTheWorld.UI.Http.Dtos.CountryDto>(); ;
+    }
+
+    private async Task GetIndexes()
+    {
+        _indexes = await Http.GetIndexTypesAsync() ?? Enumerable.Empty<string>();
+    }
+
+    private void UpdateFirstIndex(ChangeEventArgs e)
+    {
+        _firstIndex = e.Value.ToString();
+
+        _config.Options.Scales.XAxes.First().ScaleLabel.LabelString = _firstIndex;
+
+        _chart.Update();
+    }
+
+    private void UpdateSecondIndex(ChangeEventArgs e)
+    {
+        _secondIndex = e.Value.ToString();
+
+        _config.Options.Scales.YAxes.First().ScaleLabel.LabelString = _secondIndex;
+
+        _chart.Update();
+    }
+
+    private async Task LoadData()
+    {
+        _config.Options.Title.Text = $"Corellation of {_firstIndex} and {_secondIndex} in {_countries.Single(c => c.Id == _selectedCountryId).Name}";
+
+        var scatterPoints = await Http.GetIndexValuesForScatterAsync(_selectedCountryId, _firstIndex, _secondIndex);
+        var data = scatterPoints.Select(p => new ChartJs.Blazor.Common.Point(p.X, p.Y));
+
+        Color color = ChartColors.GenerateRandomColor(new Random());
+        IDataset<ChartJs.Blazor.Common.Point> dataset = new ScatterDataset(data)
+        {
+            Label = $"{_countries.Single(c => c.Id == _selectedCountryId).Name}",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(128, color)),
+            BorderColor = ColorUtil.FromDrawingColor(color),
+            PointBorderWidth = 5,
+            Fill = FillingMode.Disabled
+        };
+
+        foreach (var pointX in scatterPoints.Select(p => p.X).OrderBy(p => p))
+            _config.Data.XLabels.Add($"{pointX}");
+
+        foreach (var pointY in scatterPoints.Select(p => p.Y).OrderBy(p => p))
+            _config.Data.YLabels.Add($"{pointY}");
+
+        _config.Data.Datasets.Add(dataset);
+
+        await _chart.Update();
+    }
+
+    private void UpdateCountry(ChangeEventArgs e)
+    {
+        _selectedCountryId = int.Parse(e.Value.ToString());
+    }
+
+    private void UpdateLabels(IEnumerable<int> years)
+    {
+        IList<string> labels = _config.Data.Labels;
+        if (labels.Count == 0)
+            return;
+
+        int counter = labels.Count;
+        for (int i = counter; i > 0; i--)
+            labels.RemoveAt(i - 1);
+
+        foreach (var year in years)
+            labels.Add($"{year}");
+
+        _chart.Update();
+    }
+
+    private void ClearData()
+    {
+        IList<IDataset> datasets = _config.Data.Datasets;
+        IList<string> labelsX = _config.Data.XLabels;
+        IList<string> labelsY = _config.Data.YLabels;
+        if (datasets.Count == 0 && labelsX.Count == 0 && labelsY.Count == 0)
+            return;
+
+        if (datasets.Any())
+        {
+            int counter = datasets.Count;
+            for (int i = counter; i > 0; i--)
+                datasets.RemoveAt(i - 1);
+        }
+
+        if (labelsX.Any())
+        {
+            int counter = labelsX.Count;
+            for (int i = counter; i > 0; i--)
+                labelsX.RemoveAt(i - 1);
+        }
+
+        if (labelsY.Any())
+        {
+            int counter = labelsY.Count;
+            for (int i = counter; i > 0; i--)
+                labelsY.RemoveAt(i - 1);
+        }
+
+        _chart.Update();
+    }
+}

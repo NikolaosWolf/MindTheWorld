@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using MindTheWorld.Api.Dtos;
 using MindTheWorld.Domain;
 using MindTheWorld.Extras.Helpers;
 using MindTheWorld.Services.Definitions;
@@ -7,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace MindTheWorld.Services.Implementations
 {
-    public class SocietyService : ISocietyService
+    public class PopulationService : IPopulationService
     {
         private readonly ICsvTransformer _csvTransformer;
         private readonly ITransformService _transformService;
         private readonly MindTheWorldContext _mindTheWorldContext;
 
-        public SocietyService(ICsvTransformer csvTransformer,
+        public PopulationService(ICsvTransformer csvTransformer,
                               ITransformService transformService,
                               MindTheWorldContext mindTheWorldContext)
         {
@@ -22,26 +24,32 @@ namespace MindTheWorld.Services.Implementations
             _mindTheWorldContext = mindTheWorldContext;
         }
 
-        public async Task<IEnumerable<HappinessScore>> ImportHappinessScores(IFormFile inputFile)
+        public async Task<IEnumerable<IndexDto>> GetPopulationsAsync()
         {
-            var dataTable = await _csvTransformer.Transform(inputFile);
+            var data = await _mindTheWorldContext.Populations.Include(d => d.Country).ToListAsync();
 
-            _mindTheWorldContext
-                .HappinessScores
-                .AddRange(await _transformService.ToEntities<HappinessScore, decimal?>(dataTable));
+            var result = new List<IndexDto>();
 
-            await _mindTheWorldContext.SaveChangesAsync();
+            foreach (var item in data)
+            {
+                result.Add(new IndexDto
+                {
+                    Country = item.Country.Name,
+                    Year = item.Year,
+                    Value = item.Value.GetValueOrDefault()
+                });
+            }
 
-            return null;
+            return result;
         }
 
-        public async Task<IEnumerable<HumanDevelopmentIndex>> ImportHumanDevelopmentIndexes(IFormFile inputFile)
+        public async Task<IEnumerable<Population>> ImportPopulations(IFormFile inputFile)
         {
             var dataTable = await _csvTransformer.Transform(inputFile);
 
             _mindTheWorldContext
-                .HumanDevelopmentIndexes
-                .AddRange(await _transformService.ToEntities<HumanDevelopmentIndex, decimal?>(dataTable));
+                .Populations
+                .AddRange(await _transformService.ToEntities<Population>(dataTable));
 
             await _mindTheWorldContext.SaveChangesAsync();
 

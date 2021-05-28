@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public class WaterWithdrawlPerPerson : IndexEntity<decimal?>
+    public class WaterWithdrawlPerPerson : IndexEntity
     {
     }
 }

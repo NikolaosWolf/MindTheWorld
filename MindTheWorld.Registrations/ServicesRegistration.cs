@@ -8,6 +8,8 @@ namespace MindTheWorld.Registrations
     {
         public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
+            services.AddScoped<ICommonService, CommonService>();
+            services.AddScoped<ICountryService, CountryService>();
             services.AddScoped<IEconomyService, EconomyService>();
             services.AddScoped<IEducationService, EducationService>();
             services.AddScoped<IEnergyService, EnergyService>();

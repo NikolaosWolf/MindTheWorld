@@ -8,7 +8,15 @@ namespace MindTheWorld.Services.Definitions
 {
     public interface IEnviromentService
     {
+        Task<IEnumerable<IndexDto>> GetMaterialFootprintsAsync();
+
+        Task<IEnumerable<IndexDto>> GetCo2EmissionsAsync();
+
         Task<IEnumerable<IndexDto>> GetEpidemicDeathsAsync();
+
+        Task<IEnumerable<IndexDto>> GetRenewableWatersAsync();
+
+        Task<IEnumerable<IndexDto>> GetWaterWithdrawals();
 
         /// <summary>
         /// Imports a collection of <see cref="MaterialFootprintPerCapitum"/> from a .csv file to the database.

@@ -9,11 +9,13 @@
 
 <h2>Vertical Bar Chart</h2>
 <div>
+    <button @onclick="GetIndexes">Get Indexes</button>
+
     <select @onchange="UpdateChartByIndex">
         <option value="Select" selected disabled="disabled">(Choose Type)</option>
-        @foreach (var type in Enum.GetValues(typeof(IndexType)))
+        @foreach (var index in _indexes)
         {
-            <option value="@type">@type</option>
+            <option value="@index">@index</option>
         }
     </select>
     <select @onchange="UpdateChartByCountry">
@@ -23,14 +25,22 @@
             <option value="@country">@country</option>
         }
     </select>
+
     <button @onclick="ClearData">Clear Data</button>
 </div>
 
 <Chart Config="_config" @ref="_chart"></Chart>
+
 @code {
     private BarConfig _config;
     private Chart _chart;
 
+
+    private IEnumerable<string> _indexes;
+    private string _currentIndex;
+    private int _minYear;
+    private int _maxYear;
+    private IEnumerable<int> _allYears;
     private IDictionary<string, List<YearlyValue>> _data;
 
     protected override void OnInitialized()
@@ -52,29 +62,44 @@
             }
         };
 
-        Init();
+        Initialize();
     }
 
-    private void Init()
+    private void Initialize()
     {
+        if (_indexes == null)
+            _indexes = Enumerable.Empty<string>();
+
         if (_data == null)
             _data = new Dictionary<string, List<YearlyValue>>();
     }
 
+    private async Task GetIndexes()
+    {
+        _indexes = await Http.GetIndexTypesAsync() ?? Enumerable.Empty<string>();
+    }
+
     private async Task UpdateChartByIndex(ChangeEventArgs e)
     {
-        switch (e.Value.ToString())
-        {
-            case nameof(IndexType.EpidemicDeaths):
-                _data = LoadIndexData<Http.Dtos.BarChartDto>(await Http.GetEpidemicDeathsAsync());
-                break;
-            default:
-                break;
-        }
+        _currentIndex = e.Value.ToString();
+        _data = LoadIndexData<Http.Dtos.BarChartDto>(await Http.GetIndexValuesForBarAsync(_currentIndex));
 
-        foreach (var year in _data.First().Value.Select(v => v.Year))
+        var currentYears = _data.First().Value.Select(v => v.Year);
+        int currentMinYear = currentYears.Min();
+        int currentMaxYear = currentYears.Max();
+        if (_minYear == default && _maxYear == default)
         {
-            _config.Data.Labels.Add($"{year}");
+            _minYear = currentMinYear;
+            _maxYear = currentMaxYear;
+            _allYears = currentYears;
+
+            foreach (var year in currentYears)
+                _config.Data.Labels.Add($"{year}");
+        }
+        else
+        {
+            if (currentMinYear < _minYear || currentMaxYear > _maxYear)
+                UpdateLabels(currentYears);
         }
 
         await _chart.Update();
@@ -88,27 +113,51 @@
         Color color = ChartColors.GenerateRandomColor(new Random());
         var values = _data.Single(d => d.Key.Equals(e.Value.ToString())).Value;
 
-        IDataset<int> dataset = new BarDataset<int>(values.Select(v => v.Value))
+        IDataset<double> dataset = new BarDataset<double>(values.Select(v => v.Value))
         {
-            Label = $"{e.Value}",
+            Label = $"{_currentIndex} - {e.Value.ToString()}",
             BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(128, color)),
             BorderColor = ColorUtil.FromDrawingColor(color),
             BorderWidth = 1
         };
 
+        UpdateLabels(_allYears);
+
         _config.Data.Datasets.Add(dataset);
+        _chart.Update();
+    }
+
+    private void UpdateLabels(IEnumerable<int> years)
+    {
+        foreach (var year in _allYears.Except(years))
+            _config.Data.Labels.Add($"{year}");
+
         _chart.Update();
     }
 
     private void ClearData()
     {
         IList<IDataset> datasets = _config.Data.Datasets;
-        if (datasets.Count == 0)
+        IList<string> labels = _config.Data.Labels;
+        if (!datasets.Any() && !labels.Any())
             return;
 
-        int counter = datasets.Count;
-        for (int i = counter; i > 0; i--)
-            datasets.RemoveAt(i - 1);
+        if (datasets.Any())
+        {
+            int counter = datasets.Count;
+            for (int i = counter; i > 0; i--)
+                datasets.RemoveAt(i - 1);
+        }
+
+        if (labels.Any())
+        {
+            int counter = labels.Count;
+            for (int i = counter; i > 0; i--)
+                labels.RemoveAt(i - 1);
+
+            _minYear = default;
+            _maxYear = default;
+        }
 
         _chart.Update();
     }
@@ -137,18 +186,13 @@
         return result;
     }
 
-    private enum IndexType
+    public class YearlyValue
     {
-        EpidemicDeaths
-    }
+        public int Year { get; set; }
 
-    private class YearlyValue
-    {
-        internal int Year { get; set; }
+        public double Value { get; set; }
 
-        internal int Value { get; set; }
-
-        public YearlyValue(int year, int value)
+        public YearlyValue(int year, double value)
         {
             Year = year;
             Value = value;

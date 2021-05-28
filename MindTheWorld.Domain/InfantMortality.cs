@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public class InfantMortality : IndexEntity<decimal?>
+    public class InfantMortality : IndexEntity
     {
     }
 }

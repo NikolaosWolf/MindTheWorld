@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public class LiteracyRateAdultTotal : IndexEntity<decimal?>
+    public class LiteracyRateAdultTotal : IndexEntity
     {
     }
 }

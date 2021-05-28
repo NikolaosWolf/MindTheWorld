@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public partial class GrossDomesticProduct : IndexEntity<decimal?>
+    public partial class GrossDomesticProduct : IndexEntity
     {
     }
 }

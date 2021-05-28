@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public class Population : IndexEntity<int?>
+    public class Population : IndexEntity
     {
     }
 }

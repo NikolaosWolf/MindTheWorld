@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MindTheWorld.Domain;
 using MindTheWorld.Infrastructure.Definitions;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

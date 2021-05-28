@@ -13,7 +13,7 @@ namespace MindTheWorld.Services.Definitions
         /// <typeparam name="TIndex">Index Type</typeparam>
         /// <param name="dataTable">Contains the index information</param>
         /// <returns></returns>
-        Task<IEnumerable<TIndex>> ToEntities<TIndex, TValue>(DataTable dataTable)
-            where TIndex : IIndexEntity<TValue>, new();
+        Task<IEnumerable<TIndex>> ToEntities<TIndex>(DataTable dataTable)
+            where TIndex : IIndexEntity, new();
     }
 }

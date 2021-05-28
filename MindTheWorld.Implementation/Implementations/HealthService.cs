@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using MindTheWorld.Api.Dtos;
 using MindTheWorld.Domain;
 using MindTheWorld.Extras.Helpers;
 using MindTheWorld.Services.Definitions;
@@ -22,13 +24,32 @@ namespace MindTheWorld.Services.Implementations
             _mindTheWorldContext = mindTheWorldContext;
         }
 
+        public async Task<IEnumerable<IndexDto>> GetInfantMortalitiesAsync()
+        {
+            var data = await _mindTheWorldContext.InfantMortalities.Include(d => d.Country).ToListAsync();
+
+            var result = new List<IndexDto>();
+
+            foreach (var item in data)
+            {
+                result.Add(new IndexDto
+                {
+                    Country = item.Country.Name,
+                    Year = item.Year,
+                    Value = item.Value.GetValueOrDefault()
+                });
+            }
+
+            return result;
+        }
+
         public async Task<IEnumerable<InfantMortality>> ImportInfantMortalities(IFormFile inputFile)
         {
             var dataTable = await _csvTransformer.Transform(inputFile);
 
             _mindTheWorldContext
                 .InfantMortalities
-                .AddRange(await _transformService.ToEntities<InfantMortality, decimal?>(dataTable));
+                .AddRange(await _transformService.ToEntities<InfantMortality>(dataTable));
 
             await _mindTheWorldContext.SaveChangesAsync();
 

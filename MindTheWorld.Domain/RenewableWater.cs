@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public class RenewableWater : IndexEntity<decimal?>
+    public class RenewableWater : IndexEntity
     {
     }
 }

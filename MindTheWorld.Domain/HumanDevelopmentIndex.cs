@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public class HumanDevelopmentIndex : IndexEntity<decimal?>
+    public class HumanDevelopmentIndex : IndexEntity
     {
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using MindTheWorld.Api.Dtos;
 using MindTheWorld.Domain;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,6 +8,12 @@ namespace MindTheWorld.Services.Definitions
 {
     public interface IEnergyService
     {
+        Task<IEnumerable<IndexDto>> GetResidentialElectricityUsesAsync();
+
+        Task<IEnumerable<IndexDto>> GetCoalConsumptionsAsync();
+
+        Task<IEnumerable<IndexDto>> GetOilConsumptionsAsync();
+
         /// <summary>
         /// Imports a collection of <see cref="ResidentialElectricityUse"/> from a .csv file to the database.
         /// </summary>

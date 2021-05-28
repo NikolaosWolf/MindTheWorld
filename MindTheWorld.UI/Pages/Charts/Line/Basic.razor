@@ -1,0 +1,231 @@
+﻿@page "/charts/line/basic"
+@layout MainLayout
+@inject MindTheWorld.UI.Http.IMindTheWorldHttpClient Http
+
+@using ChartJs.Blazor.LineChart
+@using System.Drawing
+
+
+
+<h2>Basic Line Chart</h2>
+<div>
+    <button @onclick="GetIndexes">Get Indexes</button>
+
+    <select @onchange="UpdateChartByIndex">
+        <option value="Select" selected disabled="disabled">(Choose Type)</option>
+        @foreach (var index in _indexes)
+        {
+            <option value="@index">@index</option>
+        }
+    </select>
+    <select @onchange="UpdateChartByCountry">
+        <option value="Select" selected disabled="disabled">(Choose Country)</option>
+        @foreach (var country in _data.Keys)
+        {
+            <option value="@country">@country</option>
+        }
+    </select>
+
+    <button @onclick="ClearData">Clear Data</button>
+</div>
+
+<Chart Config="_config" @ref="_chart"></Chart>
+@code {
+    private LineConfig _config;
+    private Chart _chart;
+
+
+    private IEnumerable<string> _indexes;
+    private string _currentIndex;
+    private int _minYear;
+    private int _maxYear;
+    private IEnumerable<int> _allYears;
+    private IDictionary<string, List<YearlyValue>> _data;
+
+    protected override void OnInitialized()
+    {
+        _config = new LineConfig
+        {
+            Options = new LineOptions
+            {
+                Responsive = true,
+                Title = new OptionsTitle
+                {
+                    Display = true,
+                    Text = "Line Chart"
+                },
+                Tooltips = new Tooltips
+                {
+                    Mode = InteractionMode.Nearest,
+                    Intersect = true
+                },
+                Hover = new Hover
+                {
+                    Mode = InteractionMode.Nearest,
+                    Intersect = true
+                },
+                Scales = new Scales
+                {
+                    XAxes = new List<CartesianAxis>
+                    {
+                        new CategoryAxis
+                        {
+                            ScaleLabel = new ScaleLabel
+                            {
+                                LabelString = "Years",
+                                Display = true
+                            }
+                        }
+                    },
+                    YAxes = new List<CartesianAxis>
+                    {
+                        new LinearCartesianAxis
+                        {
+                            ScaleLabel = new ScaleLabel
+                            {
+                                LabelString = "Values",
+                                Display = true
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        if (_indexes == null)
+            _indexes = Enumerable.Empty<string>();
+
+        if (_data == null)
+            _data = new Dictionary<string, List<YearlyValue>>();
+    }
+
+    private async Task GetIndexes()
+    {
+        _indexes = await Http.GetIndexTypesAsync() ?? Enumerable.Empty<string>();
+    }
+
+    private async Task UpdateChartByIndex(ChangeEventArgs e)
+    {
+        _currentIndex = e.Value.ToString();
+        _data = LoadIndexData<Http.Dtos.LineChartDto>(await Http.GetIndexValuesForLineAsync(_currentIndex));
+
+        var currentYears = _data.First().Value.Select(v => v.Year);
+        int currentMinYear = currentYears.Min();
+        int currentMaxYear = currentYears.Max();
+        if (_minYear == default && _maxYear == default)
+        {
+            _minYear = currentMinYear;
+            _maxYear = currentMaxYear;
+            _allYears = currentYears;
+
+            foreach (var year in _allYears)
+                _config.Data.Labels.Add($"{year}");
+        }
+        else
+        {
+            if (currentMinYear < _minYear || currentMaxYear > _maxYear)
+                UpdateLabels(currentYears);
+        }
+
+        await _chart.Update();
+    }
+
+    private void UpdateChartByCountry(ChangeEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.Value.ToString()))
+            return;
+
+        Color color = ChartColors.GenerateRandomColor(new Random());
+        var values = _data.Single(d => d.Key.Equals(e.Value.ToString())).Value;
+        var data = values.Select(p => new ChartJs.Blazor.Common.Point(p.Year, p.Value));
+        IDataset<ChartJs.Blazor.Common.Point> dataset = new LineDataset<ChartJs.Blazor.Common.Point>(data)
+        {
+            Label = $"{_currentIndex} - {e.Value.ToString()}",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(128, color)),
+            BorderColor = ColorUtil.FromDrawingColor(color),
+            Fill = FillingMode.Disabled
+        };
+
+        UpdateLabels(_allYears);
+
+        _config.Data.Datasets.Add(dataset);
+        _chart.Update();
+    }
+
+    private void UpdateLabels(IEnumerable<int> years)
+    {
+        foreach (var year in _allYears.Except(years))
+            _config.Data.Labels.Add($"{year}");
+
+        _chart.Update();
+    }
+
+    private void ClearData()
+    {
+        IList<IDataset> datasets = _config.Data.Datasets;
+        IList<string> labels = _config.Data.Labels;
+        if (!datasets.Any() && !labels.Any())
+            return;
+
+        if (datasets.Any())
+        {
+            int counter = datasets.Count;
+            for (int i = counter; i > 0; i--)
+                datasets.RemoveAt(i - 1);
+        }
+
+        if (labels.Any())
+        {
+            int counter = labels.Count;
+            for (int i = counter; i > 0; i--)
+                labels.RemoveAt(i - 1);
+
+            _minYear = default;
+            _maxYear = default;
+        }
+
+        _chart.Update();
+    }
+
+
+    private Dictionary<string, List<YearlyValue>> LoadIndexData<T>(IEnumerable<T> apiData)
+        where T : Http.Dtos.LineChartDto
+    {
+        var result = new Dictionary<string, List<YearlyValue>>();
+        var groups = apiData.GroupBy(d => d.Country);
+        foreach (var group in groups)
+        {
+            string currentKey;
+            if (result.ContainsKey(group.Key))
+                currentKey = result.Keys.Single(k => k.Equals(group.Key));
+            else
+                currentKey = group.Key;
+
+            var values = new List<YearlyValue>();
+            foreach (var item in group)
+                values.Add(new YearlyValue(item.Year, item.Value));
+
+            result.Add(currentKey, values);
+        }
+
+        return result;
+    }
+
+    public class YearlyValue
+    {
+        public int Year { get; set; }
+
+        public double Value { get; set; }
+
+        public YearlyValue(int year, double value)
+        {
+            Year = year;
+            Value = value;
+        }
+    }
+}

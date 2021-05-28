@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public class Co2EmissionsPerPerson : IndexEntity<decimal?>
+    public class Co2EmissionsPerPerson : IndexEntity
     {
     }
 }

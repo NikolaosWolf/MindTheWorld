@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public class MaterialFootprintPerCapitum : IndexEntity<decimal?>
+    public class MaterialFootprintPerCapitum : IndexEntity
     {
     }
 }

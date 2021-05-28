@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public class CoalConsumption : IndexEntity<decimal?>
+    public class CoalConsumption : IndexEntity
     {
     }
 }

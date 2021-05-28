@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public class ResidentialElectricityUse : IndexEntity<decimal?>
+    public class ResidentialElectricityUse : IndexEntity
     {
     }
 }

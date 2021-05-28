@@ -49,8 +49,6 @@ namespace MindTheWorld.Domain
 
                 entity.ToTable("Co2EmissionsPerPerson");
 
-                entity.Property(e => e.Value).HasColumnType("decimal(10, 6)");
-
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.Co2EmissionsPerPeople)
                     .HasForeignKey(d => d.CountryId)
@@ -64,8 +62,6 @@ namespace MindTheWorld.Domain
                     .HasName("PK_CC_ID");
 
                 entity.ToTable("CoalConsumption");
-
-                entity.Property(e => e.Value).HasColumnType("decimal(18, 6)");
 
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.CoalConsumptions)
@@ -104,8 +100,6 @@ namespace MindTheWorld.Domain
 
                 entity.ToTable("GrossDomesticProduct");
 
-                entity.Property(e => e.Value).HasColumnType("decimal(10, 6)");
-
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.GrossDomesticProducts)
                     .HasForeignKey(d => d.CountryId)
@@ -119,8 +113,6 @@ namespace MindTheWorld.Domain
                     .HasName("PK_HS_ID");
 
                 entity.ToTable("HappinessScore");
-
-                entity.Property(e => e.Value).HasColumnType("decimal(10, 6)");
 
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.HappinessScores)
@@ -136,8 +128,6 @@ namespace MindTheWorld.Domain
 
                 entity.ToTable("HumanDevelopmentIndex");
 
-                entity.Property(e => e.Value).HasColumnType("decimal(10, 6)");
-
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.HumanDevelopmentIndices)
                     .HasForeignKey(d => d.CountryId)
@@ -151,8 +141,6 @@ namespace MindTheWorld.Domain
                     .HasName("PK_IM_ID");
 
                 entity.ToTable("InfantMortality");
-
-                entity.Property(e => e.Value).HasColumnType("decimal(10, 6)");
 
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.InfantMortalities)
@@ -168,8 +156,6 @@ namespace MindTheWorld.Domain
 
                 entity.ToTable("LiteracyRateAdultTotal");
 
-                entity.Property(e => e.Value).HasColumnType("decimal(10, 6)");
-
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.LiteracyRateAdultTotals)
                     .HasForeignKey(d => d.CountryId)
@@ -181,8 +167,6 @@ namespace MindTheWorld.Domain
             {
                 entity.HasKey(e => new { e.CountryId, e.Year })
                     .HasName("PK_MFPC_ID");
-
-                entity.Property(e => e.Value).HasColumnType("decimal(10, 6)");
 
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.MaterialFootprintPerCapita)
@@ -197,8 +181,6 @@ namespace MindTheWorld.Domain
                     .HasName("PK_OC_ID");
 
                 entity.ToTable("OilConsumption");
-
-                entity.Property(e => e.Value).HasColumnType("decimal(18, 6)");
 
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.OilConsumptions)
@@ -228,8 +210,6 @@ namespace MindTheWorld.Domain
 
                 entity.ToTable("RenewableWater");
 
-                entity.Property(e => e.Value).HasColumnType("decimal(18, 6)");
-
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.RenewableWaters)
                     .HasForeignKey(d => d.CountryId)
@@ -243,8 +223,6 @@ namespace MindTheWorld.Domain
                     .HasName("PK_REU_ID");
 
                 entity.ToTable("ResidentialElectricityUse");
-
-                entity.Property(e => e.Value).HasColumnType("decimal(18, 6)");
 
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.ResidentialElectricityUses)
@@ -260,8 +238,6 @@ namespace MindTheWorld.Domain
 
                 entity.ToTable("WaterSourceAccess");
 
-                entity.Property(e => e.Value).HasColumnType("decimal(10, 6)");
-
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.WaterSourceAccesses)
                     .HasForeignKey(d => d.CountryId)
@@ -275,8 +251,6 @@ namespace MindTheWorld.Domain
                     .HasName("PK_WWPP_ID");
 
                 entity.ToTable("WaterWithdrawlPerPerson");
-
-                entity.Property(e => e.Value).HasColumnType("decimal(18, 6)");
 
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.WaterWithdrawlPerPeople)

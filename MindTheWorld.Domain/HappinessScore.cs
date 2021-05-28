@@ -2,7 +2,7 @@
 
 namespace MindTheWorld.Domain
 {
-    public class HappinessScore : IndexEntity<decimal?>
+    public class HappinessScore : IndexEntity
     {
     }
 }

@@ -19,17 +19,17 @@ namespace MindTheWorld.Services.Implementations
             _countryRepository = countryRepository;
         }
 
-        public async Task<IEnumerable<TIndex>> ToEntities<TIndex, TValue>(DataTable dataTable)
-            where TIndex : IIndexEntity<TValue>, new()
+        public async Task<IEnumerable<TIndex>> ToEntities<TIndex>(DataTable dataTable)
+            where TIndex : IIndexEntity, new()
         {
 
             ICollection<Country> countries = await _countryRepository.GetCountriesAsync();
 
-            return await CreateIndexes<TIndex, TValue>(dataTable, countries);
+            return await CreateIndexes<TIndex>(dataTable, countries);
         }
 
-        private async Task<IEnumerable<TIndex>> CreateIndexes<TIndex, TValue>(DataTable dataTable, ICollection<Country> countries)
-            where TIndex : IIndexEntity<TValue>, new()
+        private async Task<IEnumerable<TIndex>> CreateIndexes<TIndex>(DataTable dataTable, ICollection<Country> countries)
+            where TIndex : IIndexEntity, new()
         {
             var indexes = new List<TIndex>();
 
@@ -47,7 +47,7 @@ namespace MindTheWorld.Services.Implementations
                     {
                         Country = country,
                         Year = year,
-                        Value = await ParseValue<TValue>(value)
+                        Value = await ParseValue(value)
                     };
                     
                     indexes.Add(index);
@@ -70,20 +70,9 @@ namespace MindTheWorld.Services.Implementations
             return country;
         }
 
-        private async Task<TValue> ParseValue<TValue>(string value)
+        private async Task<double?> ParseValue(string value)
         {
-            var valueType = typeof(TValue);
-
-            if (valueType == typeof(int) || Nullable.GetUnderlyingType(valueType) == typeof(int))
-                return string.IsNullOrEmpty(value) ? default(TValue) : (TValue)Convert.ChangeType(value, typeof(int));
-
-            if (valueType == typeof(long) || Nullable.GetUnderlyingType(valueType) == typeof(long))
-                return string.IsNullOrEmpty(value) ? default(TValue) : (TValue)Convert.ChangeType(value, typeof(long));
-
-            if (valueType == typeof(decimal) || Nullable.GetUnderlyingType(valueType) == typeof(decimal))
-                return string.IsNullOrEmpty(value) ? default(TValue) : (TValue)Convert.ChangeType(value, typeof(decimal));
-
-            return default(TValue);
+                return string.IsNullOrEmpty(value) ? default(double) : (double)Convert.ChangeType(value, typeof(double));
         }
     }
 }
